@@ -78,6 +78,5 @@ RUN echo '#!/bin/bash' > /usr/local/bin/mmake-dev \
 
 # Clean up.
 RUN   apk del emacs texlive-dvi
-RUN   ln -s /usr/local/mercury-rotd-2022-01-29/bin/mmc /usr/local/mmc
-RUN   ln -s /usr/local/mercury-DEV/bin/mmc /usr/local/bin/mmc-dev
+RUN   ln -s /usr/local/mercury-rotd-2022-01-29/bin/mmc /usr/local/bin/mmc
 RUN   rm -rf /var/cache /var/log /emacs /mercury /mercury-srcdist-rotd-@
