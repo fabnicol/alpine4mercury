@@ -1,0 +1,83 @@
+FROM alpine:latest
+
+# install packages (dependencies)
+
+RUN    apk update && apk upgrade
+RUN    apk --no-cache add bash \
+       vim nano git gcc gdb flex bison \
+       wget autoconf automake libtool gawk \
+       emacs yasm binutils coreutils \
+       util-linux-misc util-linux-dev binutils-dev \
+       make libc6-compat musl-dev \
+       texinfo texlive-dvi ncurses-dev ncurses \
+       openjdk17
+
+# Clone Emacs, with Mercury support for etags (source code tagging).
+
+RUN echo cloning since date="EMACS_DATE" rev="EMACS_REV" \
+    && git clone --shallow-since="EMACS_DATE" \
+        -b master git://git.sv.gnu.org/emacs.git \
+    && cd emacs && git reset --hard "EMACS_REV"
+
+# Build Emacs
+
+RUN cd emacs && /bin/bash autogen.sh \
+      && /bin/bash configure \
+        --without-tiff \
+        --without-jpeg \
+        --without-png \
+        --without-gif \
+        --without-gnutls \
+        --without-mailutils \
+        --without-x \
+        --prefix=/usr/local/emacs-DEV \
+      && make install -j${THREADS}
+
+# Fetch the ROTD and build it
+
+RUN wget  https://dl.mercurylang.org/rotd/mercury-srcdist-rotd-@.tar.gz -O rotd-@.tar.gz
+RUN tar xzvf rotd-@.tar.gz && rm -vf rotd-@.tar.gz
+RUN cd mercury-srcdist-rotd-@ && /bin/bash configure && make install PARALLEL=-j${THREADS}
+
+ENV PATH=/usr/local/mercury-rotd-@/bin:$PATH
+ENV THREADS=THREADS_FOUND
+ENV [ ${THREADS} = 0 ] && THREADS=1
+RUN echo "Using ${THREADS} for building."
+
+# Clone and build Mercury
+
+RUN git clone --depth=1 \
+    https://github.com/Mercury-Language/mercury.git
+RUN cd /mercury \
+      && /bin/bash prepare.sh \
+      && /bin/bash configure --disable-most-grades \
+      && make install PARALLEL=-j${THREADS}  \
+      && git rev-parse HEAD > ../GIT_HEAD
+RUN echo PATH='$PATH:/usr/local/mercury-rotd-@/bin:/usr/local/mercury-DEV/bin' >> /etc/profile
+
+
+RUN echo PATH='$PATH:/usr/local/mercury-rotd-@/bin:/usr/local/mercury-DEV/bin' >> /etc/profile
+
+RUN echo "source /etc/profile" >> /root/.bashrc
+RUN echo PATH='$PATH:/usr/local/emacs-DEV/bin' >> /etc/profile
+RUN echo MANPATH='$MANPATH:/usr/local/mercury-rotd-@/man' >> /etc/profile
+RUN echo INFOPATH='$INFOPATH:/usr/local/mercury-rotd-@/info' >> /etc/profile
+RUN echo "(add-to-list 'load-path" > /root/.emacs \
+    && echo '"/usr/local/mercury-rotd-@/lib/mercury/elisp")' >> /root/.emacs \
+    && echo "(autoload 'mdb \"gud\" \"Invoke the Mercury debugger\" t)" >> /root/.emacs
+RUN echo '#!/bin/bash' > /usr/local/bin/mmc-dev \
+    && echo 'PATH0=$PATH' >> /usr/local/bin/mmc-dev \
+    && echo 'PATH=/usr/local/mercury-DEV/bin:$PATH mmc "$@"' >> /usr/local/bin/mmc-dev \
+    && echo 'PATH=$PATH0' >> /usr/local/bin/mmc-dev \
+    && chmod +x /usr/local/bin/mmc-dev
+RUN echo '#!/bin/bash' > /usr/local/bin/mmake-dev \
+    && echo 'PATH0=$PATH' >> /usr/local/bin/mmake-dev \
+    && echo 'PATH=/usr/local/mercury-DEV/bin:$PATH mmake "$@"' >> /usr/local/bin/mmake-dev \
+    && echo 'PATH=$PATH0' >> /usr/local/bin/mmake-dev \
+    && chmod +x /usr/local/bin/mmake-dev
+
+# Clean up.
+RUN   apk del emacs texlive-dvi
+RUN   ln -s /usr/local/mercury-rotd-2022-01-29/bin/mmc /usr/local/mmc
+RUN   ln -s /usr/local/mercury-DEV/bin/mmc /usr/local/bin/mmc-dev
+RUN   rm -rf /var/cache /var/log /emacs /mercury /mercury-srcdist-rotd-@
