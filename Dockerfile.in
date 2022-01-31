@@ -53,23 +53,24 @@ RUN cd /mercury \
       && /bin/bash configure --disable-most-grades \
       && make install PARALLEL=-j${THREADS}  \
       && git rev-parse HEAD > ../GIT_HEAD
+
+# Paths
+
 RUN echo PATH='$PATH:/usr/local/mercury-rotd-@/bin:/usr/local/mercury-DEV/bin' >> /etc/profile
-
-
-RUN echo PATH='$PATH:/usr/local/mercury-rotd-@/bin:/usr/local/mercury-DEV/bin' >> /etc/profile
-
-RUN echo "source /etc/profile" >> /root/.bashrc
 RUN echo PATH='$PATH:/usr/local/emacs-DEV/bin' >> /etc/profile
 RUN echo MANPATH='$MANPATH:/usr/local/mercury-rotd-@/man' >> /etc/profile
 RUN echo INFOPATH='$INFOPATH:/usr/local/mercury-rotd-@/info' >> /etc/profile
 RUN echo "(add-to-list 'load-path" > /root/.emacs \
     && echo '"/usr/local/mercury-rotd-@/lib/mercury/elisp")' >> /root/.emacs \
     && echo "(autoload 'mdb \"gud\" \"Invoke the Mercury debugger\" t)" >> /root/.emacs
+RUN echo "source /etc/profile" >> /root/.bashrc
+
 RUN echo '#!/bin/bash' > /usr/local/bin/mmc-dev \
     && echo 'PATH0=$PATH' >> /usr/local/bin/mmc-dev \
     && echo 'PATH=/usr/local/mercury-DEV/bin:$PATH mmc "$@"' >> /usr/local/bin/mmc-dev \
     && echo 'PATH=$PATH0' >> /usr/local/bin/mmc-dev \
     && chmod +x /usr/local/bin/mmc-dev
+
 RUN echo '#!/bin/bash' > /usr/local/bin/mmake-dev \
     && echo 'PATH0=$PATH' >> /usr/local/bin/mmake-dev \
     && echo 'PATH=/usr/local/mercury-DEV/bin:$PATH mmake "$@"' >> /usr/local/bin/mmake-dev \
@@ -77,6 +78,8 @@ RUN echo '#!/bin/bash' > /usr/local/bin/mmake-dev \
     && chmod +x /usr/local/bin/mmake-dev
 
 # Clean up.
+
 RUN   apk del emacs texlive-dvi
 RUN   ln -s /usr/local/mercury-rotd-2022-01-29/bin/mmc /usr/local/bin/mmc
+RUN   ln -s /usr/local/emacs-DEV/bin/emacs /usr/local/bin/emacs
 RUN   rm -rf /var/cache /var/log /emacs /mercury /mercury-srcdist-rotd-@
