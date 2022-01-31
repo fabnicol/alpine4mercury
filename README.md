@@ -12,7 +12,8 @@ Alpine Docker image with fresh compilers for the
 You may prefer to download a compressed image from the Release section.
 The workflow unrolls along these lines:   
     
-    if wget https://github.com/fabnicol/alpine4mercury/releases/download/release-master/alpine4mercury.tar.gz
+    if wget "https://github.com/fabnicol/alpine4mercury/\
+    releases/download/release-master/alpine4mercury.tar.gz"
     then 
         if gunzip alpine4mercury.tar.gz
         then
