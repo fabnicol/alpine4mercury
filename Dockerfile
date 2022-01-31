@@ -13,4 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FROM alpine:mercuryREVISION
+FROM alpine:mercury2a85c8449f96d14ce522356fa2facb7180480bd7
