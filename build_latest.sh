@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-if [ $# = 1 ] 
+if [ $# = 1 ]
 then
     if [ "$1" = "--reuse" ]
     then
@@ -9,12 +9,12 @@ then
     elif [ "$1" = "--help" ]
     then
         echo "USAGE: build_latest.sh [--help/--reuse]"
-	echo
-	echo 'Launches build.sh $(latest_rotd.sh [--reuse]) HEAD'
-	echo
-	exit 0
+        echo
+        echo "Launches build.sh $(latest_rotd.sh [--reuse]) HEAD"
+        echo
+        exit 0
     else
-        $0 --help 
+        $0 --help
         exit 1
     fi
 else
