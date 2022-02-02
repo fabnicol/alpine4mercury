@@ -202,7 +202,7 @@ echo
 
 if [ -z "${REVISION}" ] || [ -z "${ROTD_DATE}" ] || [ -z "${GIT_SOURCE_SINCE}" ] \
     || [ -z "${THREADS_FOUND}" ] || [ -z "${EMACS_DATE}" ] \
-    || [ -z "${EMACS_DATE}" ] || [ -z "${EMACS_REV}" ])
+    || [ -z "${EMACS_DATE}" ] || [ -z "${EMACS_REV}" ]
 then
     echo "ERR: Could not parse all building parameters. Exiting..."
     exit 100
