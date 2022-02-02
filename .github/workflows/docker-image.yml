@@ -61,8 +61,13 @@ jobs:
             [ $? != 0 ] && echo "Could not create compliant image" && exit 3
             echo ${date_latest} > DATE
             docker image ls -a
-            export ID=$(docker image ls -q | head -1)
-            docker run --name alpine4mercury ${ID}
+            if [ ! -f GIT_HEAD ]
+            then
+              echo "GIT_HEAD not found"
+              exit 1
+            fi
+            REVISION="$(cat GIT_HEAD)"
+            docker run --name alpine4mercury alpine:mercury${REVISION}
             sudo docker cp alpine4mercury:/usr/local/mercury-rotd-${date_latest} /usr/local
             tar cpJvf rotd.tar.xz /usr/local/mercury-rotd-${date_latest}
             echo "Files is directory: $(ls -al)"
