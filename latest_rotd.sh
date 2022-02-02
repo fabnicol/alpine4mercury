@@ -67,7 +67,7 @@ fi
 if [ "${reuse}" = "false" ]
 then
     [ -f index.html ] && rm index.html
-    if ! wget http://dl.mercurylang.org/index.html -O index.html
+    if ! wget http://dl.mercurylang.org/index.html -O index.html --random-wait
     then
         echo "Could not download index from Mercury website."
         exit 1
