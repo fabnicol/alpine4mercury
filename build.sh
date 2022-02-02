@@ -32,7 +32,7 @@ replace_head_revision() {
         # Git SHAs have exactly 40 chars in length
         # requestiong git exact SHA
 
-        if grep -q -E grep -q -E '[a-z0-9]{40,40}' <<< "${REVISION}"
+        if grep -q -E '[a-z0-9]{40,40}' <<< "${REVISION}"
         then
 	      echo "Replacing non-hash revision with hash: ${REVISION}"
           echo "Note: HEAD^, HEAD~n are unsupported."
