@@ -32,14 +32,14 @@ replace_head_revision() {
         # Git SHAs have exactly 40 chars in length
         # requestiong git exact SHA
 
-        if grep -q -E '[a-z0-9]{40,40}' <<< "${REVISION}"
-        then
-	      echo "Replacing non-hash revision with hash: ${REVISION}"
-          echo "Note: HEAD^, HEAD~n are unsupported."
-        else
-            echo "ERR: Could not check Git SHA for Mercury repository"
-            exit 1
-        fi
+            if grep -q -E '[a-z0-9]{40,40}' <<< "${REVISION}"
+	    then
+		      echo "Replacing non-hash revision with hash: ${REVISION}"
+		      echo "Note: HEAD^, HEAD~n are unsupported."
+	    else
+		      echo "ERR: Could not check Git SHA for Mercury repository"
+		      exit 1
+	    fi
 	fi
 }
 
